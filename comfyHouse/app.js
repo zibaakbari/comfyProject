@@ -1,9 +1,9 @@
 let listFactor = [];
 let basketNumber = 0;
-const basketNum = document.getElementsByClassName("cart-items")[0];
-let factorContainer = document.getElementsByClassName("cart-overlay")[0];
-let factor = document.getElementsByClassName("cart")[0];
-let shopBasket = document.getElementsByClassName("cart-btn")[0];
+const [basketNum] = document.getElementsByClassName("cart-items");
+const [factorContainer] = document.getElementsByClassName("cart-overlay");
+const [factor] = document.getElementsByClassName("cart");
+const [shopBasket] = document.getElementsByClassName("cart-btn");
 class Product {
   constructor(title, id, price, src) {
     this.title = title;
@@ -14,9 +14,7 @@ class Product {
   }
   renderProduct() {
     basketNum.textContent = basketNumber;
-    const productsCenter = document.getElementsByClassName(
-      "products-center"
-    )[0];
+    const [productsCenter] = document.getElementsByClassName("products-center");
     products.forEach((product) => {
       this.showProducts(productsCenter, basketNum, product);
     });
@@ -30,7 +28,7 @@ class Product {
       .create("div")
       .className("img-container")
       .appendTo(imageArticle);
-    const image = builder
+    builder
       .create("img")
       .className("product-img")
       .src(product.src)
@@ -43,15 +41,18 @@ class Product {
       .onclick(() => {
         this.add(product, basketNum);
       });
-    const addIcon = builder
+    builder
       .create("i")
       .className("fas fa-shopping-cart")
       .appendTo(bagBtn);
-    const addIcon2 = builder
+    builder
       .create("i")
       .className("fas fa-shopping-cart")
       .appendTo(bagBtn);
-    const h3 = builder.create("h3").text(product.title).appendTo(imageArticle);
+    builder
+      .create("h3")
+      .text(product.title)
+      .appendTo(imageArticle);
   }
   add(product, basketNum) {
     if (!product.number) {
@@ -92,11 +93,11 @@ class Cart {
         this.hideCart();
       })
       .appendTo(cartDiv);
-    const closeIcon = builder
+    builder
       .create("i")
       .className("fas fa-window-close")
       .appendTo(closeSpan);
-    const h2 = builder.create("h2").text("your cart").appendTo(cartDiv);
+    builder.create("h2").text("your cart").appendTo(cartDiv);
     const cartContent = builder
       .create("div")
       .className("cart-content")
@@ -109,11 +110,11 @@ class Cart {
         .create("div")
         .className("cart-item")
         .appendTo(cartContent);
-      const image = builder.create("img").src(item.src).appendTo(cartItem);
+      builder.create("img").src(item.src).appendTo(cartItem);
       const textDiv = builder.create("div").appendTo(cartItem);
-      const title = builder.create("h4").text(item.title).appendTo(textDiv);
-      const price = builder.create("h5").text(item.price).appendTo(textDiv);
-      const removeItem = builder
+      builder.create("h4").text(item.title).appendTo(textDiv);
+      builder.create("h5").text(item.price).appendTo(textDiv);
+      builder
         .create("span")
         .className("remove-item")
         .text("remove")
@@ -126,7 +127,7 @@ class Cart {
         .create("p")
         .className("item-amount")
         .text(item.number);
-      const incIcon = builder
+      builder
         .create("i")
         .className("fas fa-chevron-up")
         .onclick(() => {
@@ -134,7 +135,7 @@ class Cart {
         })
         .appendTo(iconDiv);
       num.appendTo(iconDiv);
-      const decIcon = builder
+      builder
         .create("i")
         .className("fas fa-chevron-down")
         .onclick(() => {
@@ -151,7 +152,7 @@ class Cart {
     const h3 = builder.create("h3").text("your total : $ ").appendTo(footerDiv);
     const total = builder.create("span").className("cart-total").appendTo(h3);
     total.text(this.totalP());
-    const clearBtn = builder
+    builder
       .create("button")
       .className("clear-cart banner-btn")
       .text("clear cart")
@@ -183,22 +184,22 @@ class Cart {
     }
   }
   remove(item) {
-    const found = this.list.findIndex((product) => product.id === item.id);
-    this.list.splice(found, 1);
-    if (!this.list.length) {
-      this.clear();
-      return;
+    const index = this.list.findIndex((product) => product.id === item.id);
+    if (index !== -1) {
+      this.list.splice(index, 1);
+      if (!this.list.length) {
+        this.clear();
+        return;
+      }
+      basketNumber -= item.number;
+      basketNum.textContent = basketNumber;
+      this.renderCart();
     }
-    basketNumber -= item.number;
-    basketNum.textContent = basketNumber;
-    this.renderCart();
   }
   totalP() {
-    let totalPrice = 0;
-    this.list.forEach((item) => {
-      totalPrice += item.price * item.number;
-    });
-    return Math.round(totalPrice);
+    return Math.round(
+      this.list.reduce((acc, item) => acc + (item.price * item.number), 0)
+    )
   }
   clear() {
     factorContainer.classList.remove("transparentBcg");
